@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/nano.min.css"/>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Highlighter</title>
+</head>
+<body id="smart-highlighter__body">
+    <h1>EASIER</h1>
+
+    <div class="action-switcher" title="Tap to turn on!">
+        <div class="action-switcher__button"></div>
+    </div>
+
+    <div class="color-tab">
+        <div class="color-tab__background color-tab-active" style="box-shadow: -4px 0 0 0 var(--second-primary-bg);">
+            <h3>Background</h3>
+        </div>
+        <div class="color-tab__text">
+            <h3>Text</h3>
+        </div>
+    </div>
+
+    <div class="color-custom bg-section color-custom-active">
+    </div>
+
+    <div class="color-custom txt-section">
+    </div>
+
+    <div class="color-action">
+        <button class="save-color" title="Save your color!">Save</button>
+        <button class="reset-color" title="Reset to default!">Reset</button>
+    </div>
+    
+    <h3>Tap to pick your custom color</h3>
+
+    <div class="color-picker"></div>
+</body>
+
+<script src="./js/pickr.js" type="text/javascript"></script>
+<script src="./js/popup.js" type="text/javascript"></script>
+</html>

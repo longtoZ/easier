@@ -1,0 +1,186 @@
+:root {
+    --primary-bg: rgb(54, 54, 54);
+    --second-primary-bg: rgb(121, 121, 121);
+    --primary-hover: rgb(70 70 70);
+    --primary-shadow: 0px 0px 5px 1px rgb(0 0 0 / 50%);
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    } to {
+        opacity: 1;
+    }
+}
+
+@keyframes moveIn{
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    } to {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}
+
+h1, h2, h3 {
+    margin: 0px;
+}
+
+#smart-highlighter__body {
+    background-color: var(--primary-bg);
+    width: 250px;
+    height: 400px;
+    overflow-y: scroll;
+    color: white;
+}
+
+#smart-highlighter__body > h1 {
+    font-size: 40px;
+    text-align: left;
+    margin: 0 0 25px 5px;
+    float: left;
+    width: 50%;
+}
+
+#smart-highlighter__body .action-switcher {
+    margin: 15px 5px 0 0;
+    height: 15px;
+    width: 30px;
+    border-radius: 5px;
+    border: 3px solid var(--primary-hover);
+    padding: 3px;
+    background-color: transparent;
+    float: right;
+    cursor: pointer;
+    transition: all ease 0.2s;
+}
+
+#smart-highlighter__body .action-switcher__button {
+    border-radius: 5px;
+    margin: auto 0;
+    width: 15px;
+    height: 15px;
+    background-color: var(--primary-hover);
+    transform: translateX(0);
+    transition: all ease 0.2s;
+}
+
+#smart-highlighter__body .action-switcher-active {
+    border-color: mediumspringgreen;
+}
+
+#smart-highlighter__body .action-switcher-active > .action-switcher__button {
+    transform: translateX(100%);
+    background-color: mediumspringgreen;
+}
+
+#smart-highlighter__body > h3 {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+#smart-highlighter__body .color-tab {
+    display: flex;
+    justify-content: space-around;
+    width: 60%;
+    margin: 10px 5px;
+    border: 1px solid var(--second-primary-bg);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+#smart-highlighter__body .color-tab > div {
+    padding: 5%;
+    cursor: pointer;
+}
+
+.color-tab-active {
+    background-color: var(--second-primary-bg);
+    animation: fadeIn 0.2s;
+}
+
+#smart-highlighter__body .color-custom {
+    display: none;
+}
+
+.color-custom-active {
+    display: block !important;
+    animation: moveIn 0.2s;
+}
+
+#smart-highlighter__body .color-custom > div {
+    height: 25px;
+    padding: 5px;
+    margin: 5px;
+    overflow: hidden;
+    border: 1px solid var(--second-primary-bg);
+    border-radius: 4px;
+}
+
+#smart-highlighter__body .color-custom span {
+    float: left;
+    height: 100%;
+    width: 20%;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+#smart-highlighter__body .color-custom input {
+    margin: 0 5px;
+    float: left;
+    height: 100%;
+    width: 70%;
+    border: none;
+    color: white;
+    background-color: transparent;
+}
+
+#smart-highlighter__body .color-custom input:focus-visible {
+    outline: none;
+}
+
+#smart-highlighter__body .pickr {
+    text-align: center;
+    padding-bottom: 10px;
+}
+
+#smart-highlighter__body .color-action {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+#smart-highlighter__body .color-action button {
+    display: block;
+    padding: 7px 20px;
+    margin: 0 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#smart-highlighter__body .save-color {
+    background-color: #4f6788;
+    color: white;
+    border: 1px solid transparent;
+    transition: all ease 0.1s;
+}
+
+#smart-highlighter__body .save-color:hover {
+    border: 1px solid #4f6788;
+    background-color: transparent;
+    color: #4f6788;
+}
+
+#smart-highlighter__body .reset-color {
+    background-color: transparent;
+    color: tomato;
+    border: 1px solid tomato;
+    transition: all ease 0.1s;
+}
+
+#smart-highlighter__body .reset-color:hover {
+    background-color: tomato;
+    color: white;
+}
