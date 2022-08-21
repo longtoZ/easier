@@ -148,9 +148,10 @@ function receiveMessage() {
         if (!chrome.runtime.lastError) {
             if (request.cmd=='action-switch') {
                 isOn = isOn==false ? true : false
+                // console.log(isOn)
                 document.querySelector('.smart-highlighter-container').classList.toggle('deactive')
             } else {
-                console.log(request)
+                // console.log(request)
                 document.querySelector('#smart-highlighter .more-options div .' + request.class).style.backgroundColor = request.color
             }
         }
@@ -158,16 +159,16 @@ function receiveMessage() {
     });     
 }
 
-// chrome.storage.sync.get(["ACTION_SWITCH"], (data) => {
-//     if (!chrome.runtime.lastError) {
-//         console.log(data.ACTION_SWITCH)
-//         if (data.ACTION_SWITCH=="ON") {
-//             isOn = true
-//         }
-//     } else {
-//         console.error(chrome.runtime.lastError)
-//     }
-// })
+chrome.storage.sync.get(["ACTION_SWITCH"], (data) => {
+    if (!chrome.runtime.lastError) {
+        if (data.ACTION_SWITCH=="ON") {
+            isOn = true
+        }
+    } else {
+        console.error(chrome.runtime.lastError)
+    }
+})
+
 
 chrome.storage.sync.get(["COLOR_STORE"], (data) => {
     if (!chrome.runtime.lastError) {
