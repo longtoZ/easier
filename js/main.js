@@ -158,16 +158,16 @@ function receiveMessage() {
     });     
 }
 
-chrome.storage.sync.get(["ACTION_SWITCH"], (data) => {
-    if (!chrome.runtime.lastError) {
-        console.log(data.ACTION_SWITCH)
-        if (data.ACTION_SWITCH=="ON") {
-            isOn = true
-        }
-    } else {
-        console.error(chrome.runtime.lastError)
-    }
-})
+// chrome.storage.sync.get(["ACTION_SWITCH"], (data) => {
+//     if (!chrome.runtime.lastError) {
+//         console.log(data.ACTION_SWITCH)
+//         if (data.ACTION_SWITCH=="ON") {
+//             isOn = true
+//         }
+//     } else {
+//         console.error(chrome.runtime.lastError)
+//     }
+// })
 
 chrome.storage.sync.get(["COLOR_STORE"], (data) => {
     if (!chrome.runtime.lastError) {

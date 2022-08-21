@@ -184,3 +184,17 @@ h1, h2, h3 {
     background-color: tomato;
     color: white;
 }
+
+.action-succeed {
+    text-align: center;
+    font-style: italic;
+    color: mediumspringgreen;
+    padding: 5px;
+}
+
+.action-failed {
+    text-align: center;
+    font-style: italic;
+    color: tomato;
+    padding: 5px;
+}

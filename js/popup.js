@@ -63,7 +63,13 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2) {
     const txt_section = document.querySelector('#smart-highlighter__body .color-custom.txt-section')
     const color_store = document.querySelector('#smart-highlighter__body .save-color')
     const color_reset = document.querySelector('#smart-highlighter__body .reset-color')
+    const action_status = document.querySelector('#smart-highlighter__body .color-action-status p')
 
+    document.addEventListener('mousedown', function() {
+        action_status.classList.remove('action-succeed')
+        action_status.classList.remove('action-failed')
+        action_status.textContent = ''
+    })
 
     function createColor2(containerCls, cls, color, parent) {
         const container = document.createElement('div')
@@ -121,8 +127,8 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2) {
         })
     })
 
-    color_store.addEventListener('click', saveColor)
-    color_reset.addEventListener('click', resetColor)
+    color_store.addEventListener('click', () => {saveColor(action_status)})
+    color_reset.addEventListener('click', () => {resetColor(action_status)})
 
     switcher.addEventListener('click', function() {
         switcher.classList.toggle('action-switcher-active')
@@ -130,9 +136,7 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2) {
         chrome.storage.sync.get(["ACTION_SWITCH"], (data) => {
             if (!chrome.runtime.lastError) {
                 if (data.ACTION_SWITCH=="OFF") {
-                    chrome.storage.sync.set({"ACTION_SWITCH" : "ON"}, () => {
-                        console.log("ON")
-                    })
+                    chrome.storage.sync.set({"ACTION_SWITCH" : "ON"}, () => {})
                 } else {
                     chrome.storage.sync.set({"ACTION_SWITCH" : "OFF"}, () => {})
                 }
@@ -156,10 +160,11 @@ function sendMessage(obj) {
     });
 }
 
-function saveColor() {
+function saveColor(action_status) {
     const rgb2hex = (rgb) => `#${rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/).slice(1).map(n => parseInt(n, 10).toString(16).padStart(2, '0')).join('')}`
     const BGCOLOR = {}
     const TEXTCOLOR = {}
+
 
     document.querySelectorAll('#smart-highlighter__body .color-custom .bgcolor__display').forEach(i => {
         BGCOLOR[i.parentNode.className] = rgb2hex(i.style.backgroundColor)
@@ -177,22 +182,31 @@ function saveColor() {
     chrome.storage.sync.set({"COLOR_STORE" : color_store}, () => {
         var error = chrome.runtime.lastError;
         if (!error) {
-            console.log('set successfully')
+            action_status.textContent = 'Save successfully!'
+            action_status.classList.remove('action-failed')
+            action_status.classList.add('action-succeed')
         } else {
-            console.error(error)
+            action_status.textContent = 'Falied to save!'
+            action_status.classList.remove('action-succeed')
+            action_status.classList.add('action-failed')
         }
     })
 
 
 }
 
-function resetColor() {
+function resetColor(action_status) {
+
     chrome.storage.sync.clear(function() {
         var error = chrome.runtime.lastError;
         if (!error) {
-            console.log('remove successfully');
+            action_status.textContent = 'Reset successfully!'
+            action_status.classList.remove('action-failed')
+            action_status.classList.add('action-succeed')
         } else {
-            console.error(error)
+            action_status.textContent = 'Falied to reset!'
+            action_status.classList.remove('action-succeed')
+            action_status.classList.add('action-failed')
         }
     });
 
@@ -234,7 +248,7 @@ function setColor() {
 
 chrome.storage.sync.get(["ACTION_SWITCH"], (data) => {
     if (!chrome.runtime.lastError) {
-        console.log(data.ACTION_SWITCH)
+        // console.log(data.ACTION_SWITCH)
         if (data.ACTION_SWITCH=="ON") {
             document.querySelector('#smart-highlighter__body .action-switcher').classList.toggle('action-switcher-active')
         }
@@ -245,7 +259,7 @@ chrome.storage.sync.get(["ACTION_SWITCH"], (data) => {
 
 chrome.storage.sync.get(["COLOR_STORE"], (data) => {
     if (!chrome.runtime.lastError) {
-        console.log(data)
+        // console.log(data)
         const bgcolor_obj2 = data.COLOR_STORE.BGCOLOR 
         const txtcolor_obj2 = data.COLOR_STORE.TEXTCOLOR
 

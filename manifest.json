@@ -5,7 +5,19 @@
     "manifest_version": 3,
     "permissions": ["storage", "tabs", "scripting"],
     "action": {
-        "default_popup": "popup.html"
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "/img/easier-16.png",
+            "32": "/img/easier-32.png",
+            "48": "/img/easier-48.png",
+            "128": "/img/easier-128.png"
+          }
+    },
+    "icons": {
+        "16": "/img/easier-16.png",
+        "32": "/img/easier-32.png",
+        "48": "/img/easier-48.png",
+        "128": "/img/easier-128.png"
     },
     "content_scripts": [
         {
