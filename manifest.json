@@ -1,7 +1,7 @@
 {
     "name": "Easier",
     "description": "We help enhance reading experience by stylizing text in an EASIER way!",
-    "version": "0.1",
+    "version": "0.2",
     "manifest_version": 3,
     "permissions": ["storage", "tabs", "scripting"],
     "action": {
