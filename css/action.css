@@ -1,0 +1,108 @@
+:root {
+    --primary-bg: rgb(54, 54, 54);
+    --primary-hover: rgb(70 70 70);
+    --primary-shadow: 0px 0px 5px 1px rgb(0 0 0 / 50%);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    } to {
+        opacity: 1;
+    }
+}
+.smart-highlighter-container {
+    position: absolute;
+    display: none;
+    pointer-events: auto;
+    animation: fadeIn 0.2s;
+}
+
+.smart-highlighter-container.deactive {
+    display: none !important;
+    pointer-events: none;
+}
+
+.smart-highlighter-container #smart-highlighter {
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    position: relative;
+    /* width: 120px;
+    height: 30px; */
+    background-color: var(--primary-bg);
+    box-shadow: var(--primary-shadow);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.smart-highlighter-container .more-options {
+    display: none;
+    position: absolute;
+    top: 46px;
+    left: 0;
+    width: 100%;
+    padding: 5px 0;
+    background-color: var(--primary-bg);
+    box-shadow: var(--primary-shadow);
+    border-radius: 8px;
+    animation: fadeIn 0.2s;
+}
+
+.smart-highlighter-container .more-options.active {
+    display: block;
+}
+
+.smart-highlighter-container .more-options > div {
+    margin: 5px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.smart-highlighter-container .more-options button {
+    padding: 5px 0;
+    display: block;
+    float: left;
+    width: calc(100%/3);
+    height: 30px;
+    border: none;
+    cursor: pointer;
+}
+
+#smart-highlighter svg {
+    width: 12px;
+    height: auto;
+    fill: white;
+    pointer-events: none;
+    display: inline-block;
+}
+
+#smart-highlighter > div {
+    display: block;
+    padding: 8px;
+    /* border-bottom: 3px solid white; */
+    text-align: center;
+    border-radius: 8px;
+    transition: all ease 0.2s;
+}
+
+#smart-highlighter > div:hover {
+    background-color: var(--primary-hover);
+}
+
+#smart-highlighter i {
+    color: white;
+    font-size: 0.9em;
+}
+
+.smart-highlighter__style .more-options button {
+    background-color: transparent;
+}
+
+.smart-highlighter__style .more-options button:hover {
+    background-color: var(--primary-hover);
+    transition: all ease 0.2s;
+}
+
