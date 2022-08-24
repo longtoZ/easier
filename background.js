@@ -19,20 +19,35 @@ chrome.runtime.onInstalled.addListener(function() {
         'txtcolor-6': '#970023'
     }
 
+    const customcolor_obj = {
+        'bgcolor-custom': '#d4ddda',
+        'txtcolor-custom': '#ffc701',
+        'style-custom': 'bold'
+    }
+
     const color_store = {
         'BGCOLOR': bgcolor_obj2,
-        'TEXTCOLOR': txtcolor_obj2
+        'TEXTCOLOR': txtcolor_obj2,
+        'CUSTOM_PRESET': customcolor_obj
     }
 
     chrome.storage.sync.set({"COLOR_STORE" : color_store}, () => {
         if (!chrome.runtime.lastError) {
-            console.log('set successfully')
+            console.log('set color successfully')
         } else {
             console.log('set error')
         }
     })
 
     chrome.storage.sync.set({"ACTION_SWITCH" : "OFF"}, () => {
-        console.log('set default')
+        console.log('set action default')
+    })
+
+    chrome.storage.sync.set({"COLLAPSE_SWITCH" : "OFF"}, () => {
+        console.log('set collapse default')
+    })
+
+    chrome.storage.sync.set({"COLOR_MODE" : "BASIC"}, () => {
+        console.log('set color mode default')
     })
 })

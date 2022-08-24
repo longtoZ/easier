@@ -9,25 +9,66 @@
     <title>Smart Highlighter</title>
 </head>
 <body id="smart-highlighter__body">
-    <h1>EASIER</h1>
+    <h1 class="main-title">EASIER</h1>
 
-    <div class="action-switcher" title="Tap to turn on!">
+    <div class="action-switcher" title="Tap to switch!">
         <div class="action-switcher__button"></div>
     </div>
 
-    <div class="color-tab">
-        <div class="color-tab__background color-tab-active" style="box-shadow: -4px 0 0 0 var(--second-primary-bg);">
-            <h3>Background</h3>
+    <div class="basic-color-mode color-mode">
+        <div class="color-mode__select"></div>
+        <h3 class="title">Basic</h3>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-160 160C208.4 380.9 200.2 384 192 384z"/></svg>
+
+        <div class="color-tab">
+            <div class="color-tab__background color-tab-active" style="box-shadow: -4px 0 0 0 var(--second-primary-bg);">
+                <h3>Background</h3>
+            </div>
+            <div class="color-tab__text">
+                <h3>Text</h3>
+            </div>
         </div>
-        <div class="color-tab__text">
-            <h3>Text</h3>
+
+        <div class="color-custom bg-section color-custom-active">
+        </div>
+    
+        <div class="color-custom txt-section">
         </div>
     </div>
 
-    <div class="color-custom bg-section color-custom-active">
-    </div>
+    <div class="custom-color-mode color-mode">
+        <div class="color-mode__select"></div>
+        <h3 class="title">Custom</h3>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M192 384c-8.188 0-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L192 306.8l137.4-137.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-160 160C208.4 380.9 200.2 384 192 384z"/></svg>
 
-    <div class="color-custom txt-section">
+        <div class="color-custom color-custom-active">
+            <label>Background color</label>
+            <div class="bgcolor-custom" style="margin-bottom: 20px;">
+                <span class="bgcolor__display" style="background-color:#d4ddda"></span>
+                <input class="custom__input" type="text" placeholder="#d4ddda">
+            </div>
+
+            <label>Text color</label>
+            <div class="txtcolor-custom" style="margin-bottom: 20px;">
+                <span class="txtcolor__display" style="background-color:#ffc701"></span>
+                <input class="custom__input" type="text" placeholder="#ffc701">
+            </div>
+
+            <label>Text style</label>
+            <select class="style-custom" style="margin-bottom: 20px;">
+                <option value="bold">Bold</option>
+                <option value="italic">Italic</option>
+                <option value="underline">Underline</option>
+                <option value="strikethrough">Strikethrough</option>
+                <option value="subscript">Subscript</option>
+                <option value="superscript">Superscript</option>
+            </select>
+
+            <label style="float: left;">Auto highlight</label>
+            <div class="collapse-switcher" title="Tap to switch!">
+                <div class="collapse-switcher__button"></div>
+            </div>
+        </div>
     </div>
 
     <div class="color-action">

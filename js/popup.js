@@ -54,9 +54,15 @@ try {
     })
 } catch(e) {}
 
-function mainPopUp(bgcolor_obj2, txtcolor_obj2) {
+function mainPopUp(bgcolor_obj2, txtcolor_obj2, customcolor_obj) {
 
+    const title = document.querySelector('#smart-highlighter__body .main-title')
     const switcher = document.querySelector('#smart-highlighter__body .action-switcher')
+    const collapse = document.querySelector('#smart-highlighter__body .collapse-switcher')
+
+    const color_mode = document.querySelectorAll('#smart-highlighter__body .color-mode .title')
+    const color_mode_select = document.querySelectorAll('#smart-highlighter__body .color-mode__select')
+
     const bg_tab = document.querySelector('#smart-highlighter__body .color-tab__background')
     const txt_tab = document.querySelector('#smart-highlighter__body .color-tab__text')
     const bg_section = document.querySelector('#smart-highlighter__body .color-custom.bg-section')
@@ -89,6 +95,26 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2) {
 
     }
 
+    function createCustomColor(customcolor_obj) {
+        document.querySelector('.bgcolor-custom span').style.backgroundColor = customcolor_obj['bgcolor-custom']
+        document.querySelector('.bgcolor-custom input').placeholder = customcolor_obj['bgcolor-custom']
+
+        document.querySelector('.txtcolor-custom span').style.backgroundColor = customcolor_obj['txtcolor-custom']
+        document.querySelector('.txtcolor-custom input').placeholder = customcolor_obj['txtcolor-custom']
+
+        document.querySelectorAll('.style-custom option').forEach(i => {
+            if (i.value==customcolor_obj['style-custom']) {
+                i.setAttribute('selected', 'selected')
+            } else {
+                i.removeAttribute('selected')
+            }
+        })
+
+
+    }
+
+    createCustomColor(customcolor_obj)
+
     for (const i in bgcolor_obj2) {
         createColor2(i, 'bgcolor__display', bgcolor_obj2[i], bg_section)
     }
@@ -96,6 +122,41 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2) {
     for (const i in txtcolor_obj2) {
         createColor2(i, 'txtcolor__display', txtcolor_obj2[i], txt_section)
     }
+
+    color_mode.forEach(i => {
+        i.onclick = () => { 
+            i.parentNode.classList.toggle('open')
+            if (i.parentNode.classList.contains('basic-color-mode')) {
+                document.querySelector('.custom-color-mode').classList.toggle('collapse')
+            } else {
+                document.querySelector('.basic-color-mode').classList.toggle('collapse')
+
+            }
+            title.classList.toggle('collapse')
+            switcher.classList.toggle('collapse')
+        }
+    })
+
+    color_mode_select.forEach(i => {
+        i.onclick = () => {
+            i.classList.add('select')
+            i.parentNode.classList.add('select')
+            if (i.parentNode.classList.contains('basic-color-mode')) {
+                document.querySelector('.custom-color-mode').classList.remove('select')
+                document.querySelector('.custom-color-mode .color-mode__select').classList.remove('select')
+
+                sendMessage({cmd: 'color-mode-basic'})
+                chrome.storage.sync.set({"COLOR_MODE" : "BASIC"}, () => {})
+            } else {
+                document.querySelector('.basic-color-mode').classList.remove('select')
+                document.querySelector('.basic-color-mode .color-mode__select').classList.remove('select')
+
+                sendMessage({cmd: 'color-mode-custom'})
+                chrome.storage.sync.set({"COLOR_MODE" : "CUSTOM"}, () => {})
+            }
+
+        }
+    })
 
     bg_tab.addEventListener('click', function() {
         bg_tab.style.boxShadow = '-4px 0 0 0 var(--second-primary-bg)'
@@ -118,13 +179,20 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2) {
     })
 
     const color_input = document.querySelectorAll('#smart-highlighter__body .color-custom input')
-
+    const style_custom = document.querySelector('#smart-highlighter__body .color-custom select')
+    
     color_input.forEach(i => {
         i.addEventListener('change', function() {
             i.value == '' ?  i.previousElementSibling.style.backgroundColor = i.getAttribute('placeholder') : i.previousElementSibling.style.backgroundColor = i.value.toString()
             var color_send = {class: i.parentNode.className, color: i.previousElementSibling.style.backgroundColor}
             sendMessage(color_send)
         })
+    })
+
+    style_custom.addEventListener('change', function() {
+        var color_send = {class: this.className, style: this.value}
+        console.log(color_send)
+        sendMessage(color_send)
     })
 
     color_store.addEventListener('click', () => {saveColor(action_status)})
@@ -146,16 +214,29 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2) {
         })
 
     })
+
+    collapse.addEventListener('click', function() {
+        collapse.classList.toggle('collapse-switcher-active')
+        sendMessage({cmd: 'collapse-switch'})
+        chrome.storage.sync.get(["COLLAPSE_SWITCH"], (data) => {
+            if (!chrome.runtime.lastError) {
+                if (data.COLLAPSE_SWITCH=="OFF") {
+                    chrome.storage.sync.set({"COLLAPSE_SWITCH" : "ON"}, () => {})
+                } else {
+                    chrome.storage.sync.set({"COLLAPSE_SWITCH" : "OFF"}, () => {})
+                }
+            } else {
+                console.error(chrome.runtime.lastError)
+            }
+        })
+    })
 }
 
 function sendMessage(obj) {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         console.log(tabs[0])
         chrome.tabs.sendMessage(tabs[0].id, obj, function (response) {
-            // if (chrome.runtime.lastError) {
-            //     console.log('error')
-            //     chrome.runtime.lastError
-            // }
+
         })
     });
 }
@@ -164,7 +245,11 @@ function saveColor(action_status) {
     const rgb2hex = (rgb) => `#${rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/).slice(1).map(n => parseInt(n, 10).toString(16).padStart(2, '0')).join('')}`
     const BGCOLOR = {}
     const TEXTCOLOR = {}
-
+    const CUSTOM_PRESET = {
+        'bgcolor-custom': rgb2hex(document.querySelector('.bgcolor-custom span').style.backgroundColor),
+        'txtcolor-custom': rgb2hex(document.querySelector('.txtcolor-custom span').style.backgroundColor),
+        'style-custom': document.querySelector('.style-custom').value
+    }
 
     document.querySelectorAll('#smart-highlighter__body .color-custom .bgcolor__display').forEach(i => {
         BGCOLOR[i.parentNode.className] = rgb2hex(i.style.backgroundColor)
@@ -176,13 +261,14 @@ function saveColor(action_status) {
 
     const color_store = {
         'BGCOLOR': BGCOLOR,
-        'TEXTCOLOR': TEXTCOLOR
+        'TEXTCOLOR': TEXTCOLOR,
+        'CUSTOM_PRESET': CUSTOM_PRESET
     }
 
     chrome.storage.sync.set({"COLOR_STORE" : color_store}, () => {
         var error = chrome.runtime.lastError;
         if (!error) {
-            action_status.textContent = 'Save successfully!'
+            action_status.textContent = 'Save successfully! RELOAD REQUIRED'
             action_status.classList.remove('action-failed')
             action_status.classList.add('action-succeed')
         } else {
@@ -200,7 +286,7 @@ function resetColor(action_status) {
     chrome.storage.sync.clear(function() {
         var error = chrome.runtime.lastError;
         if (!error) {
-            action_status.textContent = 'Reset successfully!'
+            action_status.textContent = 'Reset successfully! RELOAD REQUIRED'
             action_status.classList.remove('action-failed')
             action_status.classList.add('action-succeed')
         } else {
@@ -232,9 +318,16 @@ function setColor() {
         'txtcolor-6': '#970023'
     }
 
+    const customcolor_obj = {
+        'bgcolor-custom': '#d4ddda',
+        'txtcolor-custom': '#ffc701',
+        'style-custom': 'bold'
+    }
+
     const color_store = {
         'BGCOLOR': bgcolor_obj2,
-        'TEXTCOLOR': txtcolor_obj2
+        'TEXTCOLOR': txtcolor_obj2,
+        'CUSTOM_PRESET': customcolor_obj
     }
 
     chrome.storage.sync.set({"COLOR_STORE" : color_store}, () => {
@@ -243,6 +336,14 @@ function setColor() {
         } else {
             console.error(chrome.runtime.lastError)
         }
+    })
+
+    chrome.storage.sync.set({"ACTION_SWITCH" : "OFF"}, () => {
+        console.log('set action default')
+    })
+
+    chrome.storage.sync.set({"COLOR_MODE" : "BASIC"}, () => {
+        console.log('set color mode default')
     })
 }
 
@@ -257,13 +358,43 @@ chrome.storage.sync.get(["ACTION_SWITCH"], (data) => {
     }
 })
 
+chrome.storage.sync.get(["COLLAPSE_SWITCH"], (data) => {
+    if (!chrome.runtime.lastError) {
+        // console.log(data.ACTION_SWITCH)
+        if (data.COLLAPSE_SWITCH=="ON") {
+            document.querySelector('#smart-highlighter__body .collapse-switcher').classList.toggle('collapse-switcher-active')
+        }
+    } else {
+        console.error(chrome.runtime.lastError)
+    }
+})
+
+chrome.storage.sync.get(["COLOR_MODE"], (data) => {
+    if (!chrome.runtime.lastError) {
+        if (data.COLOR_MODE=="BASIC") {
+            console.log('basic')
+            setTimeout(function() {
+                document.querySelector('#smart-highlighter__body .basic-color-mode .color-mode__select').click()
+            }, 100)
+        } else {
+            console.log('custom')
+            setTimeout(function() {
+                document.querySelector('#smart-highlighter__body .custom-color-mode .color-mode__select').click()
+            }, 100)
+        }
+    } else {
+        console.error(chrome.runtime.lastError)
+    }
+})
+
 chrome.storage.sync.get(["COLOR_STORE"], (data) => {
     if (!chrome.runtime.lastError) {
         // console.log(data)
         const bgcolor_obj2 = data.COLOR_STORE.BGCOLOR 
         const txtcolor_obj2 = data.COLOR_STORE.TEXTCOLOR
+        const customcolor_obj = data.COLOR_STORE.CUSTOM_PRESET
 
-        mainPopUp(bgcolor_obj2, txtcolor_obj2)
+        mainPopUp(bgcolor_obj2, txtcolor_obj2, customcolor_obj)
     } else {
         console.log('get error')
     }
