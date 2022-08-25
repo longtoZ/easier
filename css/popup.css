@@ -256,9 +256,25 @@ h1, h2, h3 {
     outline: none;
 }
 
-#smart-highlighter__body .pickr {
+#smart-highlighter__body .color-picker-container {
+    background-color: rgb(121 121 121 / 6%);
+    padding: 10px 0;
+    margin: 20px -20px;
+}
+
+#smart-highlighter__body .color-picker-container .pickr {
     text-align: center;
     padding-bottom: 10px;
+}
+
+#smart-highlighter__body .pcr-app {
+    background: var(--primary-hover);
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+#smart-highlighter__body .color-picker-container h3 {
+    text-align: center;
+    margin-bottom: 10px;
 }
 
 #smart-highlighter__body .color-action {
