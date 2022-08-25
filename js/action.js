@@ -198,7 +198,7 @@ function main(bgcolor_obj, txtcolor_obj, customcolor_obj) {
 }
 
 function receiveMessage() {
-    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
         if (!chrome.runtime.lastError) {
             if (request.cmd=='action-switch') {
                 isOn = isOn==false ? true : false
@@ -234,8 +234,9 @@ function receiveMessage() {
                     document.querySelector('#smart-highlighter .more-options div .' + request.class).textContent = request.style
                 }
             }
+            sendResponse('received')
         }
-        sendResponse('received')
+        return true
     });     
 }
 

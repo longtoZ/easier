@@ -7,10 +7,10 @@
     "action": {
         "default_popup": "popup.html",
         "default_icon": {
-            "16": "/img/easier-16.png",
-            "32": "/img/easier-32.png",
-            "48": "/img/easier-48.png",
-            "128": "/img/easier-128.png"
+            "16": "/img/easier-16-off.png",
+            "32": "/img/easier-32-off.png",
+            "48": "/img/easier-48-off.png",
+            "128": "/img/easier-128-off.png"
           }
     },
     "icons": {
@@ -22,6 +22,7 @@
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
+            "exclude_globs": ["*.pdf"],
             "js": ["./js/action.js"],
             "css": ["./css/action.css"]
         }

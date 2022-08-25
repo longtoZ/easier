@@ -71,11 +71,13 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2, customcolor_obj) {
     const color_reset = document.querySelector('#smart-highlighter__body .reset-color')
     const action_status = document.querySelector('#smart-highlighter__body .color-action-status p')
 
-    document.addEventListener('mousedown', function() {
-        action_status.classList.remove('action-succeed')
-        action_status.classList.remove('action-failed')
-        action_status.textContent = ''
-    })
+    const refresh_btn = document.querySelector('#smart-highlighter__body .color-action-status .refresh')
+
+    // document.addEventListener('mousedown', function() {
+    //     action_status.classList.remove('action-succeed')
+    //     action_status.classList.remove('action-failed')
+    //     action_status.textContent = ''
+    // })
 
     function createColor2(containerCls, cls, color, parent) {
         const container = document.createElement('div')
@@ -195,8 +197,15 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2, customcolor_obj) {
         sendMessage(color_send)
     })
 
-    color_store.addEventListener('click', () => {saveColor(action_status)})
-    color_reset.addEventListener('click', () => {resetColor(action_status)})
+    color_store.addEventListener('click', () => {
+        refresh_btn.style.display = 'block'
+        saveColor(action_status)
+    })
+
+    color_reset.addEventListener('click', () => {
+        refresh_btn.style.display = 'block'
+        resetColor(action_status)
+    })
 
     switcher.addEventListener('click', function() {
         switcher.classList.toggle('action-switcher-active')
@@ -205,8 +214,24 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2, customcolor_obj) {
             if (!chrome.runtime.lastError) {
                 if (data.ACTION_SWITCH=="OFF") {
                     chrome.storage.sync.set({"ACTION_SWITCH" : "ON"}, () => {})
+                    chrome.action.setIcon({path: 
+                        {
+                            "16": "/img/easier-16.png",
+                            "32": "/img/easier-32.png",
+                            "48": "/img/easier-48.png",
+                            "128": "/img/easier-128.png"
+                        }
+                    })
                 } else {
                     chrome.storage.sync.set({"ACTION_SWITCH" : "OFF"}, () => {})
+                    chrome.action.setIcon({path: 
+                        {
+                            "16": "/img/easier-16-off.png",
+                            "32": "/img/easier-32-off.png",
+                            "48": "/img/easier-48-off.png",
+                            "128": "/img/easier-128-off.png"
+                        }
+                    })
                 }
             } else {
                 console.error(chrome.runtime.lastError)
@@ -230,13 +255,23 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2, customcolor_obj) {
             }
         })
     })
+
+    refresh_btn.addEventListener('click', function() {
+        refresh_btn.querySelector('.transition-overlay').classList.toggle('active')
+        setTimeout(() => {
+            window.close()
+            chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+                chrome.tabs.reload(tabs[0].id)
+            })
+        }, 500)
+
+    })
 }
 
 function sendMessage(obj) {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        console.log(tabs[0])
+        // console.log(tabs[0])
         chrome.tabs.sendMessage(tabs[0].id, obj, function (response) {
-
         })
     });
 }
@@ -282,7 +317,6 @@ function saveColor(action_status) {
 }
 
 function resetColor(action_status) {
-
     chrome.storage.sync.clear(function() {
         var error = chrome.runtime.lastError;
         if (!error) {
@@ -352,6 +386,23 @@ chrome.storage.sync.get(["ACTION_SWITCH"], (data) => {
         // console.log(data.ACTION_SWITCH)
         if (data.ACTION_SWITCH=="ON") {
             document.querySelector('#smart-highlighter__body .action-switcher').classList.toggle('action-switcher-active')
+            chrome.action.setIcon({path: 
+                {
+                    "16": "/img/easier-16.png",
+                    "32": "/img/easier-32.png",
+                    "48": "/img/easier-48.png",
+                    "128": "/img/easier-128.png"
+                }
+            })
+        } else {
+            chrome.action.setIcon({path: 
+                {
+                    "16": "/img/easier-16-off.png",
+                    "32": "/img/easier-32-off.png",
+                    "48": "/img/easier-48-off.png",
+                    "128": "/img/easier-128-off.png"
+                }
+            })
         }
     } else {
         console.error(chrome.runtime.lastError)
@@ -372,12 +423,10 @@ chrome.storage.sync.get(["COLLAPSE_SWITCH"], (data) => {
 chrome.storage.sync.get(["COLOR_MODE"], (data) => {
     if (!chrome.runtime.lastError) {
         if (data.COLOR_MODE=="BASIC") {
-            console.log('basic')
             setTimeout(function() {
                 document.querySelector('#smart-highlighter__body .basic-color-mode .color-mode__select').click()
             }, 100)
         } else {
-            console.log('custom')
             setTimeout(function() {
                 document.querySelector('#smart-highlighter__body .custom-color-mode .color-mode__select').click()
             }, 100)

@@ -324,3 +324,43 @@ h1, h2, h3 {
 #smart-highlighter__body .collapse-switcher__button {
     background-color: var(--second-primary-bg);
 }
+
+#smart-highlighter__body .color-action-status button {
+    display: none;
+    background-color: var(--primary-hover);
+    border: none;
+    padding: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 auto;
+}
+
+#smart-highlighter__body .color-action-status button:hover > svg {
+    transform: rotateZ(360deg);
+}
+
+#smart-highlighter__body .color-action-status svg {
+    fill: white;
+    transform: rotateZ(0deg);
+    transition: all ease 0.6s;
+    float: left;
+    width: 25px;
+}
+
+#smart-highlighter__body .transition-overlay {
+    height: 0;
+    width: 0;
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    transform: translate(50%, -50%);
+    border-radius: 50%;
+    background-color: var(--primary-hover);
+    z-index: 4;
+    transition: all ease-in 0.4s;
+}
+
+#smart-highlighter__body .transition-overlay.active {
+    width: 600px;
+    height: 600px;
+}
