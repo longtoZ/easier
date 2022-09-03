@@ -1,7 +1,7 @@
 {
     "name": "Easier",
     "description": "We help enhance reading experience by stylizing text in an EASIER way!",
-    "version": "0.5",
+    "version": "0.5.1",
     "manifest_version": 3,
     "permissions": ["storage", "tabs", "scripting"],
     "action": {
@@ -21,8 +21,7 @@
     },
     "content_scripts": [
         {
-            "matches": ["<all_urls>"],
-            "exclude_globs": ["*.pdf"],
+            "matches": ["https://*/*", "http://*/*"],
             "js": ["./js/action.js"],
             "css": ["./css/action.css"]
         }

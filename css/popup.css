@@ -272,6 +272,11 @@ h1, h2, h3 {
     box-shadow: 0 0 10px rgba(0,0,0,0.3);
 }
 
+#smart-highlighter__body .pcr-app .pcr-interaction .pcr-type,
+#smart-highlighter__body .pcr-app .pcr-interaction .pcr-result{
+    background: var(--primary-bg);
+}
+
 #smart-highlighter__body .color-picker-container h3 {
     text-align: center;
     margin-bottom: 10px;
