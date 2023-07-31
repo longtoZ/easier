@@ -1,25 +1,7 @@
-// Simple example, see optional options for more configuration.
 try {
     const pickr = Pickr.create({
         el: '.color-picker',
         theme: 'classic', // or 'monolith', or 'nano'
-    
-        // swatches: [
-        //     'rgba(244, 67, 54, 1)',
-        //     'rgba(233, 30, 99, 0.95)',
-        //     'rgba(156, 39, 176, 0.9)',
-        //     'rgba(103, 58, 183, 0.85)',
-        //     'rgba(63, 81, 181, 0.8)',
-        //     'rgba(33, 150, 243, 0.75)',
-        //     'rgba(3, 169, 244, 0.7)',
-        //     'rgba(0, 188, 212, 0.7)',
-        //     'rgba(0, 150, 136, 0.75)',
-        //     'rgba(76, 175, 80, 0.8)',
-        //     'rgba(139, 195, 74, 0.85)',
-        //     'rgba(205, 220, 57, 0.9)',
-        //     'rgba(255, 235, 59, 0.95)',
-        //     'rgba(255, 193, 7, 1)'
-        // ],
     
         swatches: null,
     
@@ -98,6 +80,7 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2, customcolor_obj) {
     }
 
     function createCustomColor(customcolor_obj) {
+
         document.querySelector('.bgcolor-custom span').style.backgroundColor = customcolor_obj['bgcolor-custom']
         document.querySelector('.bgcolor-custom input').placeholder = customcolor_obj['bgcolor-custom']
 
@@ -117,6 +100,8 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2, customcolor_obj) {
 
     createCustomColor(customcolor_obj)
 
+
+
     for (const i in bgcolor_obj2) {
         createColor2(i, 'bgcolor__display', bgcolor_obj2[i], bg_section)
     }
@@ -130,6 +115,15 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2, customcolor_obj) {
             i.parentNode.classList.toggle('open')
             if (i.parentNode.classList.contains('basic-color-mode')) {
                 document.querySelector('.custom-color-mode').classList.toggle('collapse')
+
+                if (document.querySelector('#smart-highlighter__body .color-mode.open')) {
+                    if (document.querySelector('#smart-highlighter__body .basic-color-mode .bgcolor-custom')) {
+                        document.querySelector('#smart-highlighter__body .color-mode.open').style.height = '400px'
+                    }
+                } else {
+                    document.querySelector('#smart-highlighter__body .color-mode').style.height = ''
+                }
+
             } else {
                 document.querySelector('.basic-color-mode').classList.toggle('collapse')
 

@@ -274,6 +274,7 @@ h1, h2, h3 {
 
 #smart-highlighter__body .pcr-app .pcr-interaction .pcr-type,
 #smart-highlighter__body .pcr-app .pcr-interaction .pcr-result{
+    color: white;
     background: var(--primary-bg);
 }
 
