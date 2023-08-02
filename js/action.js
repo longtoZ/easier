@@ -1,6 +1,10 @@
-var isOn = false
-var isCollapse = false
-var mode = 'basic'
+let isOn = false
+let isCollapse = false
+let mode = 'basic'
+
+let bgcolor_obj = {}
+let txtcolor_obj = {}
+let customcolor_obj = {}
 
 function loadAction(bgcolor_obj, txtcolor_obj, customcolor_obj) {
     fetch(chrome.runtime.getURL('../action.html'))
@@ -25,11 +29,10 @@ function main(bgcolor_obj, txtcolor_obj, customcolor_obj) {
         createColor('smtxtcolor ' + i, txtcolor_obj[i], document.querySelector('.smart-highlighter__text .more-options div'))
     }
 
-    const selected_text = document.querySelectorAll("div *")
     const action_btn  = document.querySelector('.smart-highlighter-container')
 
     if (isOn==true) {
-        document.querySelector('.smart-highlighter-container').classList.remove('deactive')
+        action_btn.classList.remove('deactive')
     }
 
     if (mode=='basic') {
@@ -78,12 +81,10 @@ function main(bgcolor_obj, txtcolor_obj, customcolor_obj) {
 
                     if (pageWidth - posX < 100) {
                         action_btn.style.left = `${x - 110}px`
-                        console.log(pageWidth, pageHeight, x, y)
                     }
 
                     if (pageHeight - posY < 100) {
                         action_btn.style.top = `${y - 120}px`
-                        console.log(pageWidth, pageHeight, posX, posY)
                     }
 
                 } else {
@@ -91,7 +92,6 @@ function main(bgcolor_obj, txtcolor_obj, customcolor_obj) {
                 }
 
                 if (isCollapse==true && mode=='custom') {
-                    console.log('here')
                     document.designMode = "on"
                     document.execCommand('backColor', false, document.querySelector('#smart-highlighter .custom-btn .bgcolor-custom').style.backgroundColor)
                     document.execCommand('foreColor', false, document.querySelector('#smart-highlighter .custom-btn .txtcolor-custom').style.backgroundColor)
@@ -141,7 +141,6 @@ function main(bgcolor_obj, txtcolor_obj, customcolor_obj) {
 
     txtcolor_options.forEach(i => {
         i.onclick = function() {        
-            console.log('here')
             document.designMode = "on"
             document.execCommand("foreColor", false, i.style.backgroundColor)
             document.designMode = "off"
@@ -194,17 +193,22 @@ function main(bgcolor_obj, txtcolor_obj, customcolor_obj) {
     
         parent.appendChild(btn)
     }
-
 }
 
 function receiveMessage() {
     chrome.runtime.onMessage.addListener(async function(request, sender, sendResponse) {
         if (!chrome.runtime.lastError) {
+            const container = document.querySelector('.smart-highlighter-container')
             if (request.cmd=='action-switch') {
-                isOn = isOn==false ? true : false
-                document.querySelector('.smart-highlighter-container').classList.toggle('deactive')
-
-            } else if (request.cmd=='collapse-switch') {
+                if (isOn) {
+                    isOn = false
+                    container.remove()
+                } else {
+                    isOn = true
+                    loadAction(bgcolor_obj, txtcolor_obj, customcolor_obj)
+                }
+                
+            } else if (request.cmd=='collapse-switch' && container) {
                 isCollapse = isCollapse==false ? true : false
                 if (isCollapse==true && mode=='custom') {
                     document.querySelectorAll('#smart-highlighter > div:not(.smart-highlighter__remove)').forEach(i => {i.classList.add('hide')})
@@ -216,22 +220,23 @@ function receiveMessage() {
                     document.querySelector('#smart-highlighter .custom-btn').classList.add('hide')
                 }
 
-            } else if (request.cmd=='color-mode-basic') {
+            } else if (request.cmd=='color-mode-basic' && container) {
                 mode = 'basic'
                 document.querySelectorAll('#smart-highlighter .smbox:not(.smart-highlighter__remove)').forEach(i => {i.classList.remove('hide')})
                 document.querySelector('#smart-highlighter .custom-btn').classList.add('hide')
 
-            } else if (request.cmd=='color-mode-custom') {
+            } else if (request.cmd=='color-mode-custom' && container) {
                 mode = 'custom'
                 document.querySelectorAll('#smart-highlighter .smbox:not(.smart-highlighter__remove)').forEach(i => {i.classList.add('hide')})
                 document.querySelector('#smart-highlighter .custom-btn').classList.remove('hide')
 
             } else {
-                // console.log(request)
-                if (request.color) {
-                    document.querySelector('#smart-highlighter .more-options div .' + request.class).style.backgroundColor = request.color
-                } else {
-                    document.querySelector('#smart-highlighter .more-options div .' + request.class).textContent = request.style
+                if (container) {
+                    if (request.color) {
+                        document.querySelector('#smart-highlighter .more-options div .' + request.class).style.backgroundColor = request.color
+                    } else {
+                        document.querySelector('#smart-highlighter .more-options div .' + request.class).textContent = request.style
+                    }
                 }
             }
             sendResponse('received')
@@ -239,16 +244,6 @@ function receiveMessage() {
         return true
     });     
 }
-
-chrome.storage.sync.get(["ACTION_SWITCH"], (data) => {
-    if (!chrome.runtime.lastError) {
-        if (data.ACTION_SWITCH=="ON") {
-            isOn = true
-        }
-    } else {
-        console.error(chrome.runtime.lastError)
-    }
-})
 
 chrome.storage.sync.get(["COLLAPSE_SWITCH"], (data) => {
     if (!chrome.runtime.lastError) {
@@ -275,13 +270,49 @@ chrome.storage.sync.get(["COLOR_MODE"], (data) => {
 chrome.storage.sync.get(["COLOR_STORE"], (data) => {
     if (!chrome.runtime.lastError) {
         // console.log(data)
-        const bgcolor_obj = data.COLOR_STORE.BGCOLOR 
-        const txtcolor_obj = data.COLOR_STORE.TEXTCOLOR
-        const customcolor_obj = data.COLOR_STORE.CUSTOM_PRESET
+        bgcolor_obj = data.COLOR_STORE.BGCOLOR 
+        txtcolor_obj = data.COLOR_STORE.TEXTCOLOR
+        customcolor_obj = data.COLOR_STORE.CUSTOM_PRESET
 
-        loadAction(bgcolor_obj, txtcolor_obj, customcolor_obj)
         receiveMessage()
     } else {
         console.log('get error')
     }
+})
+
+chrome.storage.sync.get(["SITES"], (data) => {
+    chrome.storage.sync.get(["SITES_SELECT"], (select) => {
+        if (select.SITES_SELECT=='true') {
+            tab_url = (window.location.href).match(/^(http|https):\/\/(.*?).(.*?)\//g)[0]
+            for (url of data.SITES) {
+                if (tab_url == url) {
+                    if (!document.getElementById('smart-highlighter')) {
+                        isOn = true
+                        loadAction(bgcolor_obj, txtcolor_obj, customcolor_obj)
+                    } else {
+                        isOn = false
+                        document.querySelector('.smart-highlighter-container').remove()
+                    } 
+                    break
+                }
+            }
+        } else {
+            chrome.storage.sync.get(["ACTION_SWITCH"], (data) => {
+                if (!chrome.runtime.lastError) {
+                    if (data.ACTION_SWITCH=="ON") {
+                        isOn = true
+                        loadAction(bgcolor_obj, txtcolor_obj, customcolor_obj)
+                    } else {
+                        isOn = false
+                        document.querySelector('.smart-highlighter-container').remove()
+            
+                    }
+                } else {
+                    console.error(chrome.runtime.lastError)
+                }
+            })
+        }
+
+    })
+
 })

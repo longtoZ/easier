@@ -28,7 +28,6 @@ try {
 
     pickr.on('save', (color) => {
         let col = color
-        console.log(col.toHEXA())
     })
     
     pickr.on('clear', instance => {
@@ -36,11 +35,29 @@ try {
     })
 } catch(e) {}
 
+const title = document.querySelector('#smart-highlighter__body .main-title')
+const switcher = document.querySelector('#smart-highlighter__body .action-switcher')
+
+const url_list = document.querySelector('.url-item-container')
+const add_url_btn = document.querySelector('.url-box .url-add')
+const url_noti = document.querySelector('.url-noti')
+const url_pattern = /^(http|https):\/\/(.*?).(.*?)\//g
+let tab_url = ''
+chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    try {
+        tab_url = (tabs[0].url).match(url_pattern)[0];
+    } catch (e) {
+        console.log(e)
+    }
+    document.querySelector('.url-box input').setAttribute('placeholder', tab_url)
+})
+
 function mainPopUp(bgcolor_obj2, txtcolor_obj2, customcolor_obj) {
 
-    const title = document.querySelector('#smart-highlighter__body .main-title')
-    const switcher = document.querySelector('#smart-highlighter__body .action-switcher')
     const collapse = document.querySelector('#smart-highlighter__body .collapse-switcher')
+
+    const site_mode = document.querySelector('#smart-highlighter__body .site-mode .title')
+    const site_mode_select = document.querySelector('#smart-highlighter__body .site-mode__select')
 
     const color_mode = document.querySelectorAll('#smart-highlighter__body .color-mode .title')
     const color_mode_select = document.querySelectorAll('#smart-highlighter__body .color-mode__select')
@@ -54,26 +71,25 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2, customcolor_obj) {
     const action_status = document.querySelector('#smart-highlighter__body .color-action-status p')
 
     const refresh_btn = document.querySelector('#smart-highlighter__body .color-action-status .refresh')
+    const add_url_btn = document.querySelector('.url-box .url-add')
 
-    // document.addEventListener('mousedown', function() {
-    //     action_status.classList.remove('action-succeed')
-    //     action_status.classList.remove('action-failed')
-    //     action_status.textContent = ''
-    // })
-
-    function createColor2(containerCls, cls, color, parent) {
+    function createColor(containerCls, cls, color, parent) {
         const container = document.createElement('div')
         const display = document.createElement('span')
         const input = document.createElement('input')
+        const remove = document.createElement('div')
 
         container.setAttribute('class', containerCls)
         display.setAttribute('class', cls)
         display.setAttribute('style', 'background-color:' + color)
         input.setAttribute('type', 'text')
         input.setAttribute('placeholder', color)
+        remove.setAttribute('class', 'basic-color__remove')
+        remove.innerHTML = `<svg class="url-remove" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><style>svg{fill:#000000}</style><path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c-9.4 9.4-9.4 24.6 0 33.9l47 47-47 47c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l47-47 47 47c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-47-47 47-47c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-47 47-47-47c-9.4-9.4-24.6-9.4-33.9 0z"/></svg>`
 
         container.appendChild(display)
         container.appendChild(input)
+        container.appendChild(remove)
 
         parent.appendChild(container)
 
@@ -100,15 +116,46 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2, customcolor_obj) {
 
     createCustomColor(customcolor_obj)
 
-
-
     for (const i in bgcolor_obj2) {
-        createColor2(i, 'bgcolor__display', bgcolor_obj2[i], bg_section)
+        createColor(i, 'bgcolor__display', bgcolor_obj2[i], bg_section)
     }
 
     for (const i in txtcolor_obj2) {
-        createColor2(i, 'txtcolor__display', txtcolor_obj2[i], txt_section)
+        createColor(i, 'txtcolor__display', txtcolor_obj2[i], txt_section)
     }
+
+    document.querySelectorAll('.basic-color__remove').forEach(i => {
+        i.addEventListener('click', () => {
+            i.parentNode.remove()
+        })
+    })
+
+    site_mode.addEventListener('click', function() {
+        this.parentNode.classList.toggle('open')
+        document.querySelector('.basic-color-mode').classList.toggle('collapse')
+        document.querySelector('.custom-color-mode').classList.toggle('collapse')
+        title.classList.toggle('collapse')
+        switcher.classList.toggle('collapse')
+
+    })
+
+    site_mode_select.addEventListener('click', function() {
+
+        switcher.classList.toggle('hide')
+        title.classList.toggle('hide')
+
+        if (this.parentNode.classList.contains('select')) {
+            switcher.classList.remove('action-switcher-active')
+            this.classList.remove('select')
+            this.parentNode.classList.remove('select')
+            chrome.storage.sync.set({"SITES_SELECT" : 'false'})
+        } else {
+            switcher.classList.add('action-switcher-active')
+            this.classList.add('select')
+            this.parentNode.classList.add('select')
+            chrome.storage.sync.set({"SITES_SELECT" : 'true'})
+        }
+    })
 
     color_mode.forEach(i => {
         i.onclick = () => { 
@@ -154,6 +201,7 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2, customcolor_obj) {
         }
     })
 
+
     bg_tab.addEventListener('click', function() {
         bg_tab.style.boxShadow = '-4px 0 0 0 var(--second-primary-bg)'
         txt_tab.style.boxShadow = 'none'
@@ -187,7 +235,6 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2, customcolor_obj) {
 
     style_custom.addEventListener('change', function() {
         var color_send = {class: this.className, style: this.value}
-        console.log(color_send)
         sendMessage(color_send)
     })
 
@@ -260,6 +307,80 @@ function mainPopUp(bgcolor_obj2, txtcolor_obj2, customcolor_obj) {
         }, 500)
 
     })
+
+    add_url_btn.addEventListener('click', function() {
+        const input = document.querySelector('.url-box input').value.trim()
+        const url = input == '' ?  tab_url : input
+
+        console.log(tab_url)
+        addURL(url)
+        document.querySelector('.url-box input').value = ''
+
+    })
+
+}
+
+function warningNoti(txt) {
+    url_noti.style.display = 'block'
+    url_noti.textContent = txt
+    setTimeout(() => {
+        url_noti.style.display = 'none'
+        url_noti.textContent = ''
+    }, 1000)
+}
+
+function createURL(url) {
+
+    add_url_btn.classList.toggle('new')
+    const url_item = document.createElement('div')
+    url_item.classList.add('url-item')
+    url_item.innerHTML = `<input type="text" class="item" value="${url}">
+    <svg class="url-remove" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><style>svg{fill:#000000}</style><path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c-9.4 9.4-9.4 24.6 0 33.9l47 47-47 47c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l47-47 47 47c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-47-47 47-47c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-47 47-47-47c-9.4-9.4-24.6-9.4-33.9 0z"/></svg>`
+
+    url_list.appendChild(url_item)
+
+    const remove_url_btn = url_item.querySelector('.url-remove')
+    remove_url_btn.addEventListener('click', function() {
+        this.parentElement.remove()
+
+        removeURL(url)
+    })
+}
+
+function addURL(url) {
+
+    if (!url.match(/^(https|http):\/\//)) {
+        warningNoti('Require "http" or "https"!')
+        return 0
+    }
+
+    if (url.match(url_pattern)==null) {
+        warningNoti('Wrong url format!')
+        return 0 
+    }
+
+    chrome.storage.sync.get(["SITES"], (data) => {
+        let new_data = data.SITES
+        if (!new_data.includes(url)) {
+            new_data.push(url)
+            chrome.storage.sync.set({"SITES": new_data}, () => {})
+            createURL(url)
+            
+        } else {
+            warningNoti('Already in list!')
+            return 0
+        }
+    })
+    
+
+
+}
+
+function removeURL(url) {
+    chrome.storage.sync.get(["SITES"], (data) => {
+        let new_data = data.SITES.filter(i => i !== url)
+        chrome.storage.sync.set({"SITES": new_data}, () => {})
+    })
 }
 
 function sendMessage(obj) {
@@ -281,11 +402,15 @@ function saveColor(action_status) {
     }
 
     document.querySelectorAll('#smart-highlighter__body .color-custom .bgcolor__display').forEach(i => {
-        BGCOLOR[i.parentNode.className] = rgb2hex(i.style.backgroundColor)
+        if (i.parentNode.parentNode.parentNode.matches('.custom-color-mode.select') || i.parentNode.parentNode.parentNode.matches('.basic-color-mode')) {
+            BGCOLOR[i.parentNode.className] = rgb2hex(i.style.backgroundColor)
+        }
     })
 
     document.querySelectorAll('#smart-highlighter__body .color-custom .txtcolor__display').forEach(i => {
-        TEXTCOLOR[i.parentNode.className] = rgb2hex(i.style.backgroundColor)
+        if (i.parentNode.parentNode.parentNode.matches('.custom-color-mode.select') || i.parentNode.parentNode.parentNode.matches('.basic-color-mode')) {
+            TEXTCOLOR[i.parentNode.className] = rgb2hex(i.style.backgroundColor)
+        }
     })
 
     const color_store = {
@@ -376,31 +501,29 @@ function setColor() {
 }
 
 chrome.storage.sync.get(["ACTION_SWITCH"], (data) => {
-    if (!chrome.runtime.lastError) {
-        // console.log(data.ACTION_SWITCH)
-        if (data.ACTION_SWITCH=="ON") {
-            document.querySelector('#smart-highlighter__body .action-switcher').classList.toggle('action-switcher-active')
-            chrome.action.setIcon({path: 
-                {
-                    "16": "/img/easier-16.png",
-                    "32": "/img/easier-32.png",
-                    "48": "/img/easier-48.png",
-                    "128": "/img/easier-128.png"
-                }
-            })
-        } else {
-            chrome.action.setIcon({path: 
-                {
-                    "16": "/img/easier-16-off.png",
-                    "32": "/img/easier-32-off.png",
-                    "48": "/img/easier-48-off.png",
-                    "128": "/img/easier-128-off.png"
-                }
-            })
-        }
+    if (data.ACTION_SWITCH=="ON") {
+        switcher.classList.add('action-switcher-active')
+        chrome.action.setIcon({path: 
+            {
+                "16": "/img/easier-16.png",
+                "32": "/img/easier-32.png",
+                "48": "/img/easier-48.png",
+                "128": "/img/easier-128.png"
+            }
+        })
     } else {
-        console.error(chrome.runtime.lastError)
-    }
+        switcher.classList.remove('action-switcher-active')
+        chrome.action.setIcon({path: 
+            {
+                "16": "/img/easier-16-off.png",
+                "32": "/img/easier-32-off.png",
+                "48": "/img/easier-48-off.png",
+                "128": "/img/easier-128-off.png"
+            }
+        })
+    }  
+
+    
 })
 
 chrome.storage.sync.get(["COLLAPSE_SWITCH"], (data) => {
@@ -443,3 +566,70 @@ chrome.storage.sync.get(["COLOR_STORE"], (data) => {
     }
 })
 
+chrome.storage.sync.get(["SITES_SELECT"], (data) => {
+    if (!chrome.runtime.lastError) {
+        if (data.SITES_SELECT=='true') {
+            document.querySelector('#smart-highlighter__body .site-mode').classList.add('select')
+            document.querySelector('#smart-highlighter__body .site-mode__select').classList.add('select')
+            title.classList.add('hide')
+            switcher.classList.add('hide')
+
+            if (!switcher.classList.contains('action-switcher-active')) {
+                switcher.click()
+                console.log('click in sites select')
+            }
+        } 
+    } else {
+        console.error(chrome.runtime.lastError)
+    }
+})
+
+chrome.storage.sync.get(["SITES"], (data) => {
+    for (url of data.SITES) {
+        createURL(url)
+        if (tab_url == url) {
+            if (document.querySelector('.site-mode__select').classList.contains('select')) {
+                if (!switcher.classList.contains('action-switcher-active')) {
+                    switcher.click()
+                    console.log('click in sites')
+                    chrome.action.setIcon({path: 
+                        {
+                            "16": "/img/easier-16.png",
+                            "32": "/img/easier-32.png",
+                            "48": "/img/easier-48.png",
+                            "128": "/img/easier-128.png"
+                        }
+                    })
+                    break
+                } else {
+                    chrome.action.setIcon({path: 
+                        {
+                            "16": "/img/easier-16-off.png",
+                            "32": "/img/easier-32-off.png",
+                            "48": "/img/easier-48-off.png",
+                            "128": "/img/easier-128-off.png"
+                        }
+                    })
+                } 
+            }
+            
+        } 
+        
+        
+    }
+        
+        
+    
+})
+
+
+document.querySelector('.url-noti').addEventListener('click', function() {
+    this.textContent = ''
+    this.style.display = 'none'
+})
+
+document.querySelector('.url-box input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        add_url_btn.dispatchEvent(new Event('click'))
+    }
+})

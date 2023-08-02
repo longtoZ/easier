@@ -1,7 +1,7 @@
 {
     "name": "Easier",
     "description": "Stylizing text in your own way!",
-    "version": "0.6",
+    "version": "1.0",
     "manifest_version": 3,
     "permissions": ["storage", "tabs", "scripting"],
     "action": {
