@@ -5,6 +5,7 @@ Stylizing text in your own way.
 - Customize text color, background color and style (bold, italic, underline,...).
 - Choose your color and save it as custom preset.
 - Auto highlight on selecting text.
+- Domains whitelist
 
 # Installation
 1. Download the file at `https://github.com/longtoZ/easier/releases` and extract.
